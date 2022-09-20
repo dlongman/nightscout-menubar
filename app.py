@@ -14,7 +14,6 @@ class NightscoutMenuApp(rumps.App):
 
         self.nightscoutUrl = "https://d9n-nightscout.herokuapp.com"
         self.icon = "icon.png"
-        self.API_KEY = "nightscout-b1f255b7a45ad27d"
         self.low_warning = 80 # 80 mg/dL == 4.5 mmol/L
 
     @rumps.clicked("Launch Nightscout")
@@ -28,10 +27,10 @@ class NightscoutMenuApp(rumps.App):
         thread.start()
 
     def getBloodGlucose(self):
-        response = requests.get(f"{self.nightscoutUrl}/api/v1/entries.json?count=1&token={self.API_KEY}")
+        response = requests.get(f"{self.nightscoutUrl}/api/v1/entries.json?count=1")
 
         if response.status_code!=200:
-            self.title = "API Error."
+            self.title = "API Error"
             return
 
         ns_data = response.json()[0]
