@@ -30,3 +30,7 @@ jobs:
     - name: Build macOS app
       run: |
         python3 setup.py py2app
+    - uses: actions/upload-artifact@v3
+      with:
+        name: nightscout-menubar-app
+        path: ./dist/Nightscout\ Menu\ Bar.app/
