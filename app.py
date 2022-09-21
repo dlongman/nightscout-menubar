@@ -50,34 +50,22 @@ class NightscoutMenuApp(rumps.App):
         if self.reading_is_stale(sgv_date):
             self.title = ""
         else:
-            self.title = f"{formatted_sgv}{self.format_direction(direction)}"
-
-    def format_direction(self, direction) -> str:
-        trend="⇼"
-        if direction == "DoubleUp":
-            trend="⇈"
-        elif direction == "SingleUp":
-            trend="↑"
-        elif direction == "FortyFiveUp":
-            trend="↗"
-        elif direction == "Flat":
-            trend="→"
-        elif direction == "FortyFiveDown":
-            trend="↘"
-        elif direction == "SingleDown":
-            trend="↓"
-        elif direction == "DoubleDown":
-            trend="⇊"
-        elif direction == "NONE":
-            trend="⇼"
-        else:
-            trend = "↛"
-        
-        return trend
+            self.title = f"{formatted_sgv}{self.direction_indicator[direction]}"
 
     def reading_is_stale(self, dt: datetime) -> bool:
         # reading is stale if it is older than 15 mins
         return dt > datetime.now() - timedelta(minutes=-15)
+
+    direction_indicator = {
+        "DoubleUp": "⇈",
+        "SingleUp": "↑",
+        "FortyFiveUp": "↗",
+        "Flat": "→",
+        "FortyFiveDown": "↘",
+        "SingleDown": "↓",
+        "DoubleDown": "⇊",
+        "NONE": "⇼"
+    }
        
 if __name__ == '__main__':
     NightscoutMenuApp().run()
