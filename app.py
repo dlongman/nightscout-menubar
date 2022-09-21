@@ -1,71 +1,33 @@
 # Inspired from https://www.pythongasm.com/menubar-app-for-macos-using-python/ article
 # Icons from https://www.flaticon.com/free-icons/diabetes
 
-from datetime import datetime
-from datetime import timedelta
 import threading
-import requests
 import rumps
 import webbrowser
 
+from nightscout import Nightscout
+
 class NightscoutMenuApp(rumps.App):
+
+    nightscoutUrl = "https://d9n-nightscout.herokuapp.com"
+
     def __init__(self):
         super(NightscoutMenuApp, self).__init__(name="NightscoutMenuApp")
-
-        self.nightscoutUrl = "https://d9n-nightscout.herokuapp.com"
         self.icon = "icon.png"
-        self.low_warning = 80 # 80 mg/dL == 4.5 mmol/L
+        self.ns = Nightscout(self.nightscoutUrl)
 
     @rumps.clicked("Launch Nightscout")
     def launchNightscout(self, sender):
-        # launch nightscout url in browser
         webbrowser.open(self.nightscoutUrl, new=0)
 
     @rumps.timer(5)
-    def updateStockPrice(self, sender):
+    def refreshData(self, sender):
         thread = threading.Thread(target=self.getBloodGlucose)
         thread.start()
 
     def getBloodGlucose(self):
-        response = requests.get(f"{self.nightscoutUrl}/api/v1/entries.json?count=1")
-
-        if response.status_code!=200:
-            self.title = "API Error"
-            return
-
-        ns_data = response.json()[0]
-
-        sgv_mgdl = ns_data["sgv"]
-        sgv_mmol = float(sgv_mgdl)/18
-        direction = ns_data["direction"]
-        # 2022-09-19T15:08:00.000Z
-        sgv_date = datetime.strptime(ns_data["dateString"], "%Y-%m-%dT%H:%M:%S.%fZ")
-
-        formatted_sgv = "{:.1f}".format(sgv_mmol)
-
-        # if sgv_mgdl <= self.low_warning:
-        #     rumps.alert(title="Low Blood Glucose Warning", message=f"Blood glucose is {formatted_sgv} and below the low warning level")
-
-        # TODO highlight out of range readings
-        if self.reading_is_stale(sgv_date):
-            self.title = ""
-        else:
-            self.title = f"{formatted_sgv}{self.direction_indicator[direction]}"
-
-    def reading_is_stale(self, dt: datetime) -> bool:
-        # reading is stale if it is older than 15 mins
-        return dt > datetime.now() - timedelta(minutes=-15)
-
-    direction_indicator = {
-        "DoubleUp": "⇈",
-        "SingleUp": "↑",
-        "FortyFiveUp": "↗",
-        "Flat": "→",
-        "FortyFiveDown": "↘",
-        "SingleDown": "↓",
-        "DoubleDown": "⇊",
-        "NONE": "⇼"
-    }
+        self.ns.refresh()
+        self.title = self.ns.text
        
 if __name__ == '__main__':
     NightscoutMenuApp().run()
