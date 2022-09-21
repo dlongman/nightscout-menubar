@@ -4,7 +4,6 @@ import requests
 
 class Nightscout():
     
-    #nightscout_url = "https://d9n-nightscout.herokuapp.com"
     low_warning_level = 80 # 80 mg/dL == 4.5 mmol/L
     stale_reading_period = -15
     direction_indicator = {
