@@ -53,6 +53,7 @@ class Nightscout():
     title = ""
     display_mmol = True
     is_low = False
+    in_range = True
     stale_reading_period = -15
     last_refreshed = datetime.min
     data_refresh_period = 60
