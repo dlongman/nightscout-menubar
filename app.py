@@ -42,8 +42,11 @@ class NightscoutMenuApp(rumps.App):
 
     def get_bg(self):
         """Refreshes the Nightscout data and displays the data in the menubar"""
-        self.nightscout.refresh()
-        self.title = self.nightscout.text
+        try:
+            self.nightscout.refresh()
+            self.title = self.nightscout.text
+        except Exception as ex:
+            logging.error("Exception in get_bg: %s", ex)
 
 def configure_logging():
     """Configures file and console logging, file logging logs to a file
