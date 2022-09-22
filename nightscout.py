@@ -1,11 +1,13 @@
-from datetime import datetime
-from datetime import timedelta
-import requests
 import logging
 import json
 
+from datetime import datetime
+from datetime import timedelta
+import requests
+
+
 class Nightscout():
-    
+
     low_warning_level = 80 # 80 mg/dL == 4.5 mmol/L
     stale_reading_period = -15
     direction_indicator = {
@@ -22,33 +24,34 @@ class Nightscout():
     display_mmol = True
     last_refreshed = datetime.min
     data_refresh_period = 60
-    
+
     def __init__(self, base_url: str):
-        logging.info("Initialising Nighscout class")
+        logging.info("Initialising Nightscout class")
         self.reading_is_stale = None
         self.url = f"{base_url}/api/v1/entries.json?count=1"
         self.refresh()
 
     def refresh(self):
-        
-        # don't bother refreshing if the data was refreshed more 
+
+        # don't bother refreshing if the data was refreshed more
         # recently than the standard sgv reporting frequency
         if not self.data_needs_refresh():
             logging.info("Skipping data refresh")
             return
 
-        logging.info(f"Getting entries from nightscout api using {self.url}")
+        logging.info("Getting entries from nightscout api using %s", self.url)
         response = requests.get(self.url)
         if response.status_code!=200:
-            logging.debug(f"Api returned status code {response.status_code}, exiting")
+            logging.debug("Api returned status code %s, exiting", response.status_code)
             self.text = "API Error"
             return
 
         ns_data = response.json()[0]
-        logging.debug(f"Api returned data {json.dumps(ns_data)}")
+        logging.debug("Api returned data %s", json.dumps(ns_data))
 
         self.mgdl = ns_data["sgv"]
-        self.mmol = "{:.1f}".format(float(self.mgdl)/18)
+        calculated_mmol = float(self.mgdl)/18
+        self.mmol = f"{calculated_mmol:.1f}"
         if self.display_mmol:
             self.value = self.mmol
         else:
@@ -64,12 +67,13 @@ class Nightscout():
         # record when data was last refreshed so we can reduce the number of api requests
         self.last_refreshed = datetime.now()
 
-        logging.debug(f"{self}")
+        logging.debug("OBJECT: %s", str(self))
 
     def data_needs_refresh(self) -> bool:
         seconds_since_last_refresh = (datetime.now() - self.last_refreshed).total_seconds()
         return seconds_since_last_refresh >= self.data_refresh_period
 
     def __str__(self):
-        return f"Latest reading from {self.date}\n\ttext={self.text}\n\tis_stale={self.is_stale}\n\tmmol={self.mmol}\n\tmgdl={self.mgdl}"
+        return f"Latest reading from {self.date}\n\ttext={self.text} \
+            \n\tis_stale={self.is_stale}\n\tmmol={self.mmol}\n\tmgdl={self.mgdl}"
     
