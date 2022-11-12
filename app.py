@@ -18,7 +18,7 @@ class NightscoutMenuApp(rumps.App):
     Uses the rumps package to create the macOS UI
     """
 
-    nightscoutUrl = "https://d9n-nightscout.herokuapp.com"
+    nightscoutUrl = "https://d9n-nightscout.azurewebsites.net"
 
     def __init__(self):
         super(NightscoutMenuApp, self).__init__(name="NightscoutMenuApp")
