@@ -56,7 +56,7 @@ def configure_logging():
     """
     print(os.getenv('NS_LOG_FILE'))
     log_file = os.getenv('NS_LOG_FILE') or \
-        "/Users/Dave/nightscout/menubar-app/nightscout_menubar.log"
+        "./nightscout_menubar.log"
     log_level = os.getenv('NS_LOG_LEVEL') or logging.INFO
 
     logger = logging.getLogger()
