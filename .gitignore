@@ -4,3 +4,4 @@ dist/
 stocks.py
 __pycache__/
 .vscode/
+nightscout_menubar.log
