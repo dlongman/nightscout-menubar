@@ -76,7 +76,7 @@ class Nightscout():
             return
 
         logging.info("Getting entries from nightscout api using %s", self.url)
-        response = requests.get(self.url)
+        response = requests.get(self.url, timeout=5)
         if response.status_code!=200:
             logging.debug("Api returned status code %s, exiting", response.status_code)
             self.text = "API Error"
